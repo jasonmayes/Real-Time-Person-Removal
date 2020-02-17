@@ -11,6 +11,16 @@ Right now the best use case is where you have a dynamic background where by no h
 
 ![disappearing people](https://user-images.githubusercontent.com/4972997/74691149-882fce00-5196-11ea-80bc-f1b9cb3ff275.gif)
 
+
+## Live Demos
+
+Go ahead and try it right now in your own web browser. Pick your preference:
+
+Codepen.io: https://codepen.io/jasonmayes/pen/GRJqgma
+
+Glitch.com: https://glitch.com/~disappearing-people
+
+
 ## Usage
 
 Feel free to use in your own projects. If you decide to use my code please consider giving me a shout out! Would love to see what others create with it :-) Thanks.
