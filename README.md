@@ -9,7 +9,7 @@ This is an experiment. It will not be perfect, and it will not work in all situa
 
 Right now the best use case is where you have a dynamic background where by no humans pass by anything that is moving in such dynamic background.
 
-![Video of the code in action](https://cdn.glitch.com/a13ed164-44bb-4b90-9f1e-e18bb092216e%2Fdisappearing%20people.gif?v=1581979597780 "Video of the code in action. Top video is live view, bottom is the real time removal of people")
+![disappearing people](https://user-images.githubusercontent.com/4972997/74691149-882fce00-5196-11ea-80bc-f1b9cb3ff275.gif)
 
 
 ---
