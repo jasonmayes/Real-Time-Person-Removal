@@ -14,7 +14,7 @@ Right now the best use case is where you have a dynamic background where by no h
 
 ## Live Demos
 
-Go ahead and try it right now in your own web browser. Pick your preference:
+Go ahead and try it right now in your own web browser. Pick your preference and give me a fork / like :-)
 
 Codepen.io: https://codepen.io/jasonmayes/pen/GRJqgma
 
