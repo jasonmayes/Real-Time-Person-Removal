@@ -1,0 +1,107 @@
+/******************************************************
+ * Stylesheet by Jason Mayes 2020.
+ *
+ * Get latest code on my Github:
+ * https://github.com/jasonmayes/Real-Time-Person-Removal
+ * Got questions? Reach out to me on social:
+ * Twitter: @jason_mayes
+ * LinkedIn: https://www.linkedin.com/in/creativetech
+ *****************************************************/
+
+body {
+  font-family: helvetica, arial, sans-serif;
+  margin: 2em;
+  color: #3D3D3D;
+}
+
+h1 {
+  font-style: italic;
+  color: #FF6F00;
+}
+
+h2 {
+  clear: both;
+}
+
+em {
+  font-weight: bold;
+}
+
+video {
+  clear: both;
+  display: block;
+}
+
+section {
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
+}
+
+header, footer {
+  clear: both;
+}
+
+button {
+  z-index: 1000;
+  position: relative;
+}
+
+.removed {
+  display: none;
+}
+
+.invisible {
+  opacity: 0.2;
+}
+
+.note {
+  font-style: italic;
+  font-size: 130%;
+}
+
+.webcam {
+  position: relative;
+}
+
+.webcam, .classifyOnClick {
+  position: relative;
+  float: left;
+  width: 48%;
+  margin: 2% 1%;
+  cursor: pointer;
+}
+
+.webcam p, .classifyOnClick p {
+  position: absolute;
+  padding: 5px;
+  background-color: rgba(255, 111, 0, 0.85);
+  color: #FFF;
+  border: 1px dashed rgba(255, 255, 255, 0.7);
+  z-index: 2;
+  font-size: 12px;
+}
+
+.highlighter {
+  background: rgba(0, 255, 0, 0.25);
+  border: 1px dashed #fff;
+  z-index: 1;
+  position: absolute;
+}
+
+.classifyOnClick {
+  z-index: 0;
+  position: relative;
+}
+
+.classifyOnClick canvas, .webcam canvas.overlay {
+  opacity: 1;
+  
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+#liveView {
+  transform-origin: top left;
+  transform: scale(1);
+}

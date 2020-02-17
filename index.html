@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Disappearing People Project</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Jason Mayes">
+
+    <!-- Import the webpage's stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Import TensorFlow.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js" type="text/javascript"></script>
+  </head>  
+  <body>
+    <h1>Disappearing People Project</h1>
+    
+    <header class="note"> 
+      <h2>Removing people from complex backgrounds in real time using TensorFlow.js</h2>
+    </header>
+
+    <h2>How to use</h2>
+    <p>Please wait for the model to load before trying the demos below at which point they will become visible when ready to use.</p>
+    <p>Here is a video of what you can expect to achieve using my custom algorithm. The top is the actual footage, the bottom video is with the real time removal of people working in JavaScript!</p>
+    <video height="640" src="https://cdn.glitch.com/a13ed164-44bb-4b90-9f1e-e18bb092216e%2F2020-02-17_13-57-20.mp4?v=1581976768197" loop autoplay></video>
+    <section id="demos" class="invisible">
+
+      <h2>Demo: Webcam continuous classification</h2>
+      <p>Try this out using your webcam. Stand a few feet away from your webcam and start walking around... Watch as you slowly disappear in the bottom preview.</p>
+      
+      <div id="liveView" class="webcam">
+        <button id="webcamButton">Enable Webcam</button>
+        <video id="webcam" autoplay></video>
+      </div>
+    </section>
+  
+
+    <!-- Include the Glitch button to show what the webpage is about and
+         to make it easier for folks to view source and remix -->
+    <div class="glitchButton" style="position:fixed;top:20px;right:20px;"></div>
+    <script src="https://button.glitch.me/button.js"></script>
+    
+    <!-- Load the bodypix model to recognize body parts in images -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
+    
+    <!-- Import the page's JavaScript to do some stuff -->
+    <script src="script.js" defer></script>
+  </body>
+</html>
