@@ -1,5 +1,5 @@
 /********************************************************************
- * Demo created by Jason Mayes 2020.
+ * Real-Time-Person-Removal Created by Jason Mayes 2020.
  *
  * Get latest code on my Github:
  * https://github.com/jasonmayes/Real-Time-Person-Removal
@@ -34,15 +34,18 @@ const segmentationProperties = {
 };
 
 
-// Must be even. The size of square we wish to search.
+// Must be even. The size of square we wish to search for body parts.
+// This is the smallest area that will render/not render depending on
+// if a body part is found in that square.
 const SEARCH_RADIUS = 300;
 const SEARCH_OFFSET = SEARCH_RADIUS / 2;
-// Should be smaller than search_radius. Effects overlap in search space
-// to clean up body overspill for things that were not classified as
-// body but infact were.
+
+// RESOLUTION_MIN should be smaller than SEARCH RADIUS. About 10x smaller seems to 
+// work well. Effects overlap in search space to clean up body overspill for things
+// that were not classified as body but infact were.
 const RESOLUTION_MIN = 20;
 
-// A function to render returned segmentation data to a given canvas context.
+// Render returned segmentation data to a given canvas context.
 function processSegmentation(canvas, segmentation) {
   var ctx = canvas.getContext('2d');
   
@@ -89,13 +92,13 @@ function processSegmentation(canvas, segmentation) {
         }
       }
       
-      
       // Update patch if patch was clean.     
       if (!foundBodyPartNearby) {
         for (let i = xMin; i < xMax; i++) {
           for (let j = yMin; j < yMax; j++) {
             // Convert xy co-ords to array offset.
             let offset = j * canvas.width + i;
+
             data[offset * 4] = dataL[offset * 4];    
             data[offset * 4 + 1] = dataL[offset * 4 + 1];
             data[offset * 4 + 2] = dataL[offset * 4 + 2];
@@ -108,6 +111,7 @@ function processSegmentation(canvas, segmentation) {
             for (let j = yMin; j < yMax; j++) {
               // Convert xy co-ords to array offset.
               let offset = j * canvas.width + i;
+
               data[offset * 4] = 255;    
               data[offset * 4 + 1] = 0;
               data[offset * 4 + 2] = 0;
@@ -119,7 +123,6 @@ function processSegmentation(canvas, segmentation) {
 
     }
   }
-
   ctx.putImageData(imageData, 0, 0);
 }
 
