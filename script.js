@@ -216,6 +216,8 @@ function enableCam(event) {
       webcamCanvas.height = video.videoHeight;
       videoRenderCanvas.width = video.videoWidth;
       videoRenderCanvas.height = video.videoHeight;
+      let webcamCanvasCtx = webcamCanvas.getContext('2d');
+      webcamCanvasCtx.drawImage(video, 0, 0);
     });
     
     video.srcObject = stream;
