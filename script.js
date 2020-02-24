@@ -47,25 +47,15 @@ const bodyPixProperties = {
 const segmentationProperties = {
   flipHorizontal: false,
   internalResolution: 'high',
-  segmentationThreshold: 0.9
+  segmentationThreshold: 0.9,
+  scoreThreshold: 0.2
 };
 
-
-// Must be even. The size of square we wish to search for body parts.
-// This is the smallest area that will render/not render depending on
-// if a body part is found in that square.
-const SEARCH_RADIUS = 300;
-const SEARCH_OFFSET = SEARCH_RADIUS / 2;
-
-// RESOLUTION_MIN should be smaller than SEARCH RADIUS. About 10x smaller seems to 
-// work well. Effects overlap in search space to clean up body overspill for things
-// that were not classified as body but infact were.
-const RESOLUTION_MIN = 20;
 
 // Render returned segmentation data to a given canvas context.
 function processSegmentation(canvas, segmentation) {
   var ctx = canvas.getContext('2d');
-  
+  console.log(segmentation)
   // Get data from our overlay canvas which is attempting to estimate background.
   var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   var data = imageData.data;
@@ -73,74 +63,92 @@ function processSegmentation(canvas, segmentation) {
   // Get data from the live webcam view which has all data.
   var liveData = videoRenderCanvasCtx.getImageData(0, 0, canvas.width, canvas.height);
   var dataL = liveData.data;
+   
+  var minX = 100000;
+  var minY = 100000;
+  var maxX = 0;
+  var maxY = 0;
   
-  // Now loop through and see if pixels contain human parts. If not, update 
-  // backgound understanding with new data.
-  for (let x = RESOLUTION_MIN; x < canvas.width; x += RESOLUTION_MIN) {
-    for (let y = RESOLUTION_MIN; y < canvas.height; y += RESOLUTION_MIN) {
-      // Convert xy co-ords to array offset.
+  var foundBody = false;
+  
+  // Go through pixels and figure out bounding box of body pixels.
+  for (let x = 0; x < canvas.width; x++) {
+    for (let y = 0; y < canvas.height; y++) {
       let n = y * canvas.width + x;
-      
-      let foundBodyPartNearby = false;
-      
-      // Let's check around a given pixel if any other pixels were body like.
-      let yMin = y - SEARCH_OFFSET;
-      yMin = yMin < 0 ? 0: yMin;
-      
-      let yMax = y + SEARCH_OFFSET;
-      yMax = yMax > canvas.height ? canvas.height : yMax;
-      
-      let xMin = x - SEARCH_OFFSET;
-      xMin = xMin < 0 ? 0: xMin;
-      
-      let xMax = x + SEARCH_OFFSET;
-      xMax = xMax > canvas.width ? canvas.width : xMax;
-      
-      for (let i = xMin; i < xMax; i++) {
-        for (let j = yMin; j < yMax; j++) {
-          
-          let offset = j * canvas.width + i;
-          // If any of the pixels in the square we are analysing has a body
-          // part, mark as contaminated.
-          if (segmentation.data[offset] !== 0) {
-            foundBodyPartNearby = true;
-            break;
-          } 
+      // Human pixel found. Update bounds.
+      if (segmentation.data[n] !== 0) {
+        if(x < minX) {
+          minX = x;
         }
+        
+        if(y < minY) {
+          minY = y;
+        }
+        
+        if(x > maxX) {
+          maxX = x;
+        }
+        
+        if(y > maxY) {
+          maxY = y;
+        }
+        foundBody = true;
       }
-      
-      // Update patch if patch was clean.     
-      if (!foundBodyPartNearby) {
-        for (let i = xMin; i < xMax; i++) {
-          for (let j = yMin; j < yMax; j++) {
-            // Convert xy co-ords to array offset.
-            let offset = j * canvas.width + i;
+    } 
+  }
+  
+  // Calculate dimensions of bounding box.
+  var width = maxX - minX;
+  var height = maxY - minY;
+  
+  // Define scale factor to use to allow for false negatives around this region.
+  var scale = 1.3;
 
-            data[offset * 4] = dataL[offset * 4];    
-            data[offset * 4 + 1] = dataL[offset * 4 + 1];
-            data[offset * 4 + 2] = dataL[offset * 4 + 2];
-            data[offset * 4 + 3] = 255;            
-          }
-        }
-      } else {
-        if (DEBUG) {
-          for (let i = xMin; i < xMax; i++) {
-            for (let j = yMin; j < yMax; j++) {
-              // Convert xy co-ords to array offset.
-              let offset = j * canvas.width + i;
+  //  Define scaled dimensions.
+  var newWidth = width * scale;
+  var newHeight = height * scale;
 
-              data[offset * 4] = 255;    
-              data[offset * 4 + 1] = 0;
-              data[offset * 4 + 2] = 0;
-              data[offset * 4 + 3] = 255;            
-            }
-          } 
-        }
+  // Caculate the offset to place new bounding box so scaled from center of current bounding box.
+  var offsetX = (newWidth - width) / 2;
+  var offsetY = (newHeight - height) / 2;
+
+  var newXMin = minX - offsetX;
+  var newYMin = minY - offsetY;
+  
+  
+  // Now loop through update backgound understanding with new data
+  // if not inside a bounding box.
+  for (let x = 0; x < canvas.width; x++) {
+    for (let y = 0; y < canvas.height; y++) {
+      // If outside bounding box and we found a body, update background.
+      if (foundBody && (x < newXMin || x > newXMin + newWidth) || ( y < newYMin || y > newYMin + newHeight)) {
+        // Convert xy co-ords to array offset.
+        let n = y * canvas.width + x;
+
+        data[n * 4] = dataL[n * 4];
+        data[n * 4 + 1] = dataL[n * 4 + 1];
+        data[n * 4 + 2] = dataL[n * 4 + 2];
+        data[n * 4 + 3] = 255;            
+
+      } else if (!foundBody) {
+        // No body found at all, update all pixels.
+        let n = y * canvas.width + x;
+        data[n * 4] = dataL[n * 4];
+        data[n * 4 + 1] = dataL[n * 4 + 1];
+        data[n * 4 + 2] = dataL[n * 4 + 2];
+        data[n * 4 + 3] = 255;    
       }
-
     }
   }
+
   ctx.putImageData(imageData, 0, 0);
+  
+  if (DEBUG) {
+    ctx.strokeStyle = "#00FF00"
+    ctx.beginPath();
+    ctx.rect(newXMin, newYMin, newWidth, newHeight);
+    ctx.stroke();
+  }
 }
 
 
@@ -216,6 +224,8 @@ function enableCam(event) {
       webcamCanvas.height = video.videoHeight;
       videoRenderCanvas.width = video.videoWidth;
       videoRenderCanvas.height = video.videoHeight;
+      bodyPixCanvas.width = video.videoWidth;
+      bodyPixCanvas.height = video.videoHeight;
       let webcamCanvasCtx = webcamCanvas.getContext('2d');
       webcamCanvasCtx.drawImage(video, 0, 0);
     });
@@ -236,6 +246,14 @@ var videoRenderCanvasCtx = videoRenderCanvas.getContext('2d');
 var webcamCanvas = document.createElement('canvas');
 webcamCanvas.setAttribute('class', 'overlay');
 liveView.appendChild(webcamCanvas);
+
+// Create a canvas to render ML findings from to manipulate.
+var bodyPixCanvas = document.createElement('canvas');
+bodyPixCanvas.setAttribute('class', 'overlay');
+var bodyPixCanvasCtx = bodyPixCanvas.getContext('2d');
+bodyPixCanvasCtx.fillStyle = '#FF0000';
+
+liveView.appendChild(bodyPixCanvas);
 
 // If webcam supported, add event listener to button for when user
 // wants to activate it.
