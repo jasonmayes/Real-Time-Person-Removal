@@ -22,7 +22,7 @@
  * Get latest code on my Github:
  * https://github.com/jasonmayes/Real-Time-Person-Removal
  *
- * Got questions? Reach out to me on social:
+ * Got questions? Reach out to me on social: sure?
  * Twitter: @jason_mayes
  * LinkedIn: https://www.linkedin.com/in/creativetech
  ********************************************************************/
